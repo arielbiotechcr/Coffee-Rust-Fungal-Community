@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ariel Torres" />
 
-<meta name="date" content="2026-07-16" />
+<meta name="date" content="2026-07-22" />
 
 <title>Fungal Communities associated with the Coffee Rust</title>
 
@@ -1588,7 +1588,7 @@ border-radius: 0px;
 <h1 class="title toc-ignore">Fungal Communities associated with the
 Coffee Rust</h1>
 <h4 class="author">Ariel Torres</h4>
-<h4 class="date">2026-07-16</h4>
+<h4 class="date">2026-07-22</h4>
 
 </div>
 
@@ -1608,16 +1608,14 @@ and beta diversity indices.</p>
 </div>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<pre class="r"><code>## =========================================================
-## SETUP: package installation (CRAN, Bioconductor, GitHub)
-## =========================================================
+<pre class="r"><code>## SETUP: package installation (CRAN, Bioconductor, GitHub)
 
-## --- 0. Tools needed first ---
+### --- 0. Tools needed first ---
 if (!requireNamespace(&quot;devtools&quot;, quietly = TRUE)) install.packages(&quot;devtools&quot;)
 if (!requireNamespace(&quot;remotes&quot;, quietly = TRUE)) install.packages(&quot;remotes&quot;)
 if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE)) install.packages(&quot;BiocManager&quot;)
 
-## --- 1. Package lists ---
+### --- 1. Package lists ---
 cran_packages &lt;- c(&quot;bookdown&quot;, &quot;knitr&quot;, &quot;tidyverse&quot;, &quot;plyr&quot;, &quot;gridExtra&quot;,
                     &quot;kableExtra&quot;, &quot;xtable&quot;, &quot;ggpubr&quot;, &quot;ggplot2&quot;,
                     &quot;RColorBrewer&quot;, &quot;openxlsx&quot;, &quot;xlsx&quot;, &quot;microViz&quot;, &quot;ComplexHeatmap&quot;, &quot;FSA&quot;, &quot;vegan&quot;)  # xlsx needs Java; openxlsx doesn&#39;t
@@ -1690,9 +1688,8 @@ statistical and ecological analyses.</p></li>
 <p>Together, these three datasets form the foundation for downstream
 analyses such as diversity metrics, differential abundance testing, and
 taxonomic visualization.</p>
-<pre class="r"><code>## =========================================================
-## Load: Abundance Data
-## =========================================================
+<pre class="r"><code># Load: Abundance Data
+
 
 df_count &lt;- read.xlsx2(&quot;abundanceITS2.xlsx&quot;, sheetIndex = 1, row.names = 1)
 df_count &lt;- df_count %&gt;% mutate_if(is.character, as.numeric) # to have only numeric values 
@@ -1703,9 +1700,7 @@ sapply(df_count, class)</code></pre>
 ## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
 ##     Hv19p     Hv20p     Hv21p 
 ## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot;</code></pre>
-<pre class="r"><code>## =========================================================
-## Load: Taxonomy &amp; Metadata 
-## =========================================================
+<pre class="r"><code>## Load: Taxonomy &amp; Metadata 
 
 #Import taxonomy dataset
 df_tax &lt;- read.table(&#39;taxonomy.tsv&#39;, row.names=1, header=TRUE, sep=&#39;\t&#39;)
@@ -1975,10 +1970,9 @@ sample_data(fungi_physeq_norm)</code></pre>
 ## Hv05p      Hv05p
 ## Hv06p      Hv06p
 ## Hv07p      Hv07p</code></pre>
-<pre class="r"><code>## -------------------------------------------------------------
-## 2. Set your grouping variable
-## -------------------------------------------------------------
-GROUP_VAR &lt;- &quot;var&quot;   # &lt;-- change to match the actual column name in df_meta
+<pre class="r"><code>## 2. Set your grouping variable
+
+GROUP_VAR &lt;- &quot;var&quot;   # &lt;-- change it to match the actual column name in df_meta
 
 stopifnot(GROUP_VAR %in% colnames(sample_data(fungi_physeq_norm)))
 sample_data(fungi_physeq_norm)[[GROUP_VAR]] &lt;- factor(sample_data(fungi_physeq_norm)[[GROUP_VAR]])
@@ -1992,9 +1986,8 @@ cat(&quot;Tree varieties detected:\n&quot;)</code></pre>
 ##              1              1              7              1              1 
 ##        Caturra Caturra_Catuai         Geisha         Varios        Venecia 
 ##              3              1              1              2              1</code></pre>
-<pre class="r"><code>## -------------------------------------------------------------
-## 3. Basic sanity checks
-## -------------------------------------------------------------
+<pre class="r"><code>## 3. Basic sanity checks
+
 fungi_physeq_norm</code></pre>
 <pre><code>## phyloseq-class experiment-level object
 ## otu_table()   OTU Table:         [ 1707 taxa and 19 samples ]
@@ -2018,9 +2011,8 @@ greater cumulative depth. In Costa Rica, Catuaí and Caturra are the most
 widely cultivated varieties, which is reflected in their higher
 sequencing depth relative to the less common varieties in this
 dataset.</p>
-<pre class="r"><code>## -------------------------------------------------------------
-## 4. Sequencing depth: raw vs normalized, by tree variety
-## -------------------------------------------------------------
+<pre class="r"><code>## 4. Sequencing depth: raw vs normalized, by tree variety
+
 depth_df &lt;- data.frame(
   Sample    = sample_names(physeq),
   Raw_Reads = sample_sums(physeq),
@@ -2047,10 +2039,9 @@ print(p_depth_raw) </code></pre>
 <pre class="r"><code>summary(depth_df$Raw_Reads)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   45199   56060   68090   70810   85586   98448</code></pre>
-<pre class="r"><code>## -------------------------------------------------------------
-## 5. Rarefaction curves (on RAW counts, colored by variety)
-##    Rarefaction should always use raw counts, not normalized ones
-## -------------------------------------------------------------
+<pre class="r"><code>## 5. Rarefaction curves (on RAW counts, colored by variety)
+###    Rarefaction should always use raw counts, not normalized ones
+
 otu_mat &lt;- as(otu_table(physeq), &quot;matrix&quot;)
 if (taxa_are_rows(physeq)) otu_mat &lt;- t(otu_mat)
 
